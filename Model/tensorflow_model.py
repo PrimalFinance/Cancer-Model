@@ -14,7 +14,7 @@ from sklearn.model_selection import train_test_split
 # Tensorflow imports
 import tensorflow as tf
 
-class CancerModel: 
+class TensorCancerModel: 
     def __init__(self) -> None:
         self.dataset = pd.DataFrame()
         self.modelParams = {}
