@@ -3,36 +3,42 @@ from Model.pytorch_model import TorchCancerModel
 
 
 '''----------------- Tensorflow -----------------'''
-def tensorflow(arg):
-    if arg == 1:
-        trainAndSave()
-    elif arg == 2:
-        loadAndEvaluate()
-def trainAndSave(epochs = 1000):
-    model = TensorCancerModel()
-    model.trainModel(epochs)
-    model.saveModel()
-def loadAndEvaluate():
-    model = TensorCancerModel()
-    model.loadModel()
-    evaluation = model.evaluateModel()
-    formatted = '{:,.2f}'.format(evaluation[1] * 100)
-    print(f"Accuracy: {formatted}%")
-    
+
+class Tflow:
+    def __init__(self) -> None:
+        self.model = TensorCancerModel()
+        
+    def trainAndSave(self, epochs = 1000):
+        self.model.trainModel(epochs)
+        self.model.saveModel()
+        
+    def loadAndEvaluate(self):
+        self.model.loadModel()
+        evaluation = self.model.evaluateModel()
+        formatted = '{:,.2f}'.format(evaluation[1] * 100)
+        print(f"Accuracy: {formatted}%")
+
 '''----------------- Pytorch -----------------'''
-def pytorch(arg):
-    if arg == 1:
-        torchTrain()
+class Ptorch:
+    def __init__(self) -> None:
+        self.model = TorchCancerModel()
         
+    def trainAndSave(self):
+        self.model.trainModel()
+        self.model.saveModel()
         
-def torchTrain():
-    model = TorchCancerModel()
-    model.trainModel()
+    def loadAndEvaluate(self):
+        self.model.loadModel()
+        evaluation = self.model.evaluateModel()
+        print(f"Evaluaton: {evaluation}")
+        
+    
     
 
 
 
 if __name__ == "__main__":
-    #tensorflow(1)
-    pytorch(1)
-    #loadAndEvaluate()
+    p = Ptorch()
+    t = Tflow()
+    
+    p.loadAndEvaluate()

@@ -11,6 +11,7 @@ print(f"{datasetPath}")
 
 # Scikit-learn imports
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report
 # Pytorch imports
 import torch
 import torch.nn as nn
@@ -77,35 +78,49 @@ class TorchCancerModel:
 
             if epoch % 100 == 0:
                 print(f'Epoch {epoch}/{epochs}, Loss: {loss.item()}')
+                
+        self.model = model
         
     # ---------------------------------------------------
     def evaluateModel(self):
         x_train, x_test, y_train, y_test = self.getModelParams()
-        evaluation = self.model.evaluate(x_test, y_test)
-        return evaluation
+        # Format tensors
+        x_tensor = torch.Tensor(x_test.values)
+        y_tensor = torch.Tensor(y_test.values)
+        x_test_tensor = torch.FloatTensor(x_tensor)
+        y_test_tensor = torch.FloatTensor(y_tensor)
+        
+        with torch.no_grad():
+            self.model.eval()
+            predictions = self.model(x_test_tensor).squeeze().round().numpy()
+            
+         # Evaluate accuracy
+        accuracy = accuracy_score(y_test, predictions)
+
+        # Additional evaluation metrics (optional)
+        report = classification_report(y_test, predictions, target_names=['class 0', 'class 1'])
+
+        return accuracy, report
+        
     # ---------------------------------------------------   
-    def saveModel(self, filepath='Model/saved-models/tensorflow_cancer_model.h5'):
+    def saveModel(self, filepath='Model/saved-models/pytorch_cancer_model.pth'):
         if self.model:
-            self.model.save(filepath)
+            torch.save(self.model.state_dict(), filepath)
             print(f'Model saved to {filepath}')
         else:
             print('No model to save. Train the model first.')
     # ---------------------------------------------------        
-    # def loadModel(self, filepath='Model/saved-models/tensorflow_cancer_model.h5'):
-    #     if os.path.exists(filepath):
-    #         self.model = tf.keras.models.load_model(filepath)
-    #         print(f'Model loaded from {filepath}')
-    #     else:
-    #         print(f'Error: Model file {filepath} not found.')
+    def loadModel(self, filepath='Model/saved-models/pytorch_cancer_model.pth'):
+        if os.path.exists(filepath):
+            x_train, x_test, y_train, y_test = self.getModelParams()
+            model = Network(x_train.shape[1])
+            model.load_state_dict(torch.load(filepath))
+            self.model = model
+            print(f'Model loaded from {filepath}')
+        else:
+            print(f'Error: Model file {filepath} not found.')
     
       
     # ---------------------------------------------------
     
     
-
-'''
-####
-TODO:
-Add save and load method for torch model. 
-Add evaluation getters 
-'''
